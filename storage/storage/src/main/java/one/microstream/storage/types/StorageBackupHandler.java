@@ -470,7 +470,8 @@ public interface StorageBackupHandler extends Runnable, StorageActivePart
 			{
 				// on any mismatch, the backup transaction file is deleted (potentially moved&renamed) and rebuilt.
 				this.deleteBackupTransactionFile(backupInventory);
-				this.copyFile(liveTransactionsFile, backupTransactionFile);
+				final StorageBackupTransactionsFile backupTransactionFileNew = liveTransactionsFile.ensureBackupFile(this);
+				this.copyFile(liveTransactionsFile, backupTransactionFileNew);
 			}
 		}
 				
