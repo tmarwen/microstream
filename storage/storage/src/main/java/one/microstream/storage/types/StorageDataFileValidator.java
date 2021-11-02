@@ -174,26 +174,28 @@ public interface StorageDataFileValidator
 	
 	public static StorageDataFileValidator.Creator Creator(
 		final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider,
-		final StorageEntityDataValidator.Creator   entityDataValidatorCreator
+		final StorageEntityDataValidator.Creator   entityDataValidatorCreator,
+		final StorageTypeDictionary                storageTypeDictionary
 	)
 	{
 		return new StorageDataFileValidator.Creator.Default(
 			entityDataIteratorProvider,
-			entityDataValidatorCreator
+			entityDataValidatorCreator,
+			storageTypeDictionary
 		);
 	}
 	
-	@Deprecated
-	public static StorageDataFileValidator.Creator CreatorDebugLogging(
-		final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider,
-		final StorageEntityDataValidator.Creator   entityDataValidatorCreator
-	)
-	{
-		return new StorageDataFileValidator.Creator.DebugLogging(
-			entityDataIteratorProvider,
-			entityDataValidatorCreator
-		);
-	}
+//	@Deprecated
+//	public static StorageDataFileValidator.Creator CreatorDebugLogging(
+//		final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider,
+//		final StorageEntityDataValidator.Creator   entityDataValidatorCreator
+//	)
+//	{
+//		return new StorageDataFileValidator.Creator.DebugLogging(
+//			entityDataIteratorProvider,
+//			entityDataValidatorCreator
+//		);
+//	}
 	
 	public interface Creator
 	{
@@ -201,20 +203,25 @@ public interface StorageDataFileValidator
 			final StorageTypeDictionary typeDictionary
 		);
 		
+		public StorageDataFileValidator createDataFileValidator();
+		
 		
 		public class Default implements StorageDataFileValidator.Creator
 		{
 			private final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider;
 			private final StorageEntityDataValidator.Creator   entityDataValidatorCreator;
+			private final StorageTypeDictionary                storageTypeDictionary;
 			
 			Default(
 				final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider,
-				final StorageEntityDataValidator.Creator   entityDataValidatorCreator
+				final StorageEntityDataValidator.Creator   entityDataValidatorCreator, 
+				final StorageTypeDictionary                storageTypeDictionary
 			)
 			{
 				super();
 				this.entityDataIteratorProvider = entityDataIteratorProvider;
 				this.entityDataValidatorCreator = entityDataValidatorCreator;
+				this.storageTypeDictionary      = storageTypeDictionary;
 			}
 			
 			@Override
@@ -228,31 +235,40 @@ public interface StorageDataFileValidator
 					StorageFileEntityDataIterator.New()
 				);
 			}
-			
-		}
-		
-		@Deprecated
-		public final class DebugLogging extends StorageDataFileValidator.Creator.Default
-		{
-			DebugLogging(
-				final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider,
-				final StorageEntityDataValidator.Creator   entityDataValidatorCreator
-			)
-			{
-				super(entityDataIteratorProvider, entityDataValidatorCreator);
-			}
-			
+
 			@Override
-			public StorageDataFileValidator createDataFileValidator(
-				final StorageTypeDictionary typeDictionary
-			)
-			{
-				return new StorageDataFileValidator.Debugging(
-					super.createDataFileValidator(typeDictionary)
+			public StorageDataFileValidator createDataFileValidator() {
+				return StorageDataFileValidator.New(
+					this.entityDataIteratorProvider.provideEntityDataIterator()            ,
+					this.entityDataValidatorCreator.createDataFileValidator(storageTypeDictionary),
+					StorageFileEntityDataIterator.New()
 				);
 			}
 			
 		}
+		
+//		@Deprecated
+//		public final class DebugLogging extends StorageDataFileValidator.Creator.Default
+//		{
+//			DebugLogging(
+//				final BinaryEntityRawDataIterator.Provider entityDataIteratorProvider,
+//				final StorageEntityDataValidator.Creator   entityDataValidatorCreator
+//			)
+//			{
+//				super(entityDataIteratorProvider, entityDataValidatorCreator);
+//			}
+//			
+//			@Override
+//			public StorageDataFileValidator createDataFileValidator(
+//				final StorageTypeDictionary typeDictionary
+//			)
+//			{
+//				return new StorageDataFileValidator.Debugging(
+//					super.createDataFileValidator(typeDictionary)
+//				);
+//			}
+//			
+//		}
 		
 	}
 	
