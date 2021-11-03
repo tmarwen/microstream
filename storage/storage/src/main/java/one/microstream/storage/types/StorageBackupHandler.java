@@ -243,10 +243,6 @@ public interface StorageBackupHandler extends Runnable, StorageActivePart
 					try
 					{
 						this.itemQueue.processNextItem(this, 10_000);
-//						if(!this.itemQueue.processNextItem(this, 10_000))
-//						{
-//							this.validator.freeMemory();
-//						}
 					}
 					catch(final InterruptedException e)
 					{
